@@ -9,8 +9,9 @@ const LoginPage: React.FC = () => {
   const location = useLocation();
   
   const [credentials, setCredentials] = useState<LoginCredentials>({
-    email: '',
-    password: '',
+    UserName: '',
+    Password: '',
+    companyCode: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,16 +27,16 @@ const LoginPage: React.FC = () => {
   const validateForm = (): boolean => {
     const errors: Partial<LoginCredentials> = {};
     
-    if (!credentials.email.trim()) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(credentials.email)) {
-      errors.email = 'Please enter a valid email address';
+    if (!credentials.UserName.trim()) {
+      errors.UserName = 'Username is required';
     }
-    
-    if (!credentials.password.trim()) {
-      errors.password = 'Password is required';
-    } else if (credentials.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
+    if (!credentials.Password.trim()) {
+      errors.Password = 'Password is required';
+    }
+    if (!credentials.companyCode.trim()) {
+      errors.companyCode = 'Company code is required';
+    } else if (!/^[0-9]+$/.test(credentials.companyCode)) {
+      errors.companyCode = 'Company code must be numbers only';
     }
     
     setFieldErrors(errors);
@@ -110,6 +111,30 @@ const LoginPage: React.FC = () => {
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Company Code Field */}
+            <div>
+              <label htmlFor="companyCode" className="block text-sm font-medium text-gray-700 mb-2">
+                Company Code
+              </label>
+              <input
+                id="companyCode"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                autoComplete="off"
+                required
+                value={credentials.companyCode}
+                onChange={e => handleInputChange('companyCode', e.target.value.replace(/[^0-9]/g, ''))}
+                className={`block w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                  fieldErrors.companyCode ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                }`}
+                placeholder="Enter your company code"
+                maxLength={10}
+              />
+              {fieldErrors.companyCode && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.companyCode}</p>
+              )}
+            </div>
             {/* Demo Credentials Info */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <h3 className="text-sm font-medium text-blue-800 mb-2">Demo Credentials</h3>
@@ -134,18 +159,18 @@ const LoginPage: React.FC = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  value={credentials.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  value={credentials.UserName}
+                  onChange={(e) => handleInputChange('UserName', e.target.value)}
                   className={`block w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                    fieldErrors.email 
+                    fieldErrors.UserName 
                       ? 'border-red-300 bg-red-50' 
                       : 'border-gray-300 hover:border-gray-400'
                   }`}
                   placeholder="Enter your email"
                 />
               </div>
-              {fieldErrors.email && (
-                <p className="mt-1 text-sm text-red-600">{fieldErrors.email}</p>
+              {fieldErrors.UserName && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.UserName}</p>
               )}
             </div>
 
@@ -163,10 +188,10 @@ const LoginPage: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
-                  value={credentials.password}
-                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  value={credentials.Password}
+                  onChange={(e) => handleInputChange('Password', e.target.value)}
                   className={`block w-full pl-10 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
-                    fieldErrors.password 
+                    fieldErrors.Password 
                       ? 'border-red-300 bg-red-50' 
                       : 'border-gray-300 hover:border-gray-400'
                   }`}
@@ -184,8 +209,8 @@ const LoginPage: React.FC = () => {
                   )}
                 </button>
               </div>
-              {fieldErrors.password && (
-                <p className="mt-1 text-sm text-red-600">{fieldErrors.password}</p>
+              {fieldErrors.Password && (
+                <p className="mt-1 text-sm text-red-600">{fieldErrors.Password}</p>
               )}
             </div>
 

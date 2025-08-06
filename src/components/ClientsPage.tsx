@@ -2,19 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
-  Filter, 
   Loader2, 
   AlertCircle, 
   RefreshCw,
   X,
   ChevronUp,
   ChevronDown,
-  Users,
-  Mail,
-  Phone,
-  Building,
-  Calendar,
-  FileText
+  Users
 } from 'lucide-react';
 import { Client, ApiError } from '../types';
 import { clientApi } from '../services/api';
@@ -26,10 +20,8 @@ const ClientsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [sortField, setSortField] = useState<keyof Client>('name');
+  const [sortField, setSortField] = useState<keyof Client>('ClientName');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [showFilters, setShowFilters] = useState(false);
 
   const fetchClients = async () => {
     try {
@@ -57,37 +49,32 @@ const ClientsPage: React.FC = () => {
     // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(client =>
-        client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        client.phone?.includes(searchTerm)
+        client.ClientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.OrganizationName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.Email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.Mobile.includes(searchTerm) ||
+        client.Country.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.City.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        client.Description.toLowerCase().includes(searchTerm.toLowerCase())
       );
-    }
-
-    // Apply status filter
-    if (statusFilter) {
-      filtered = filtered.filter(client => client.status === statusFilter);
     }
 
     // Apply sorting
     filtered.sort((a, b) => {
       const aValue = a[sortField];
       const bValue = b[sortField];
-      
       if (typeof aValue === 'string' && typeof bValue === 'string') {
         const comparison = aValue.localeCompare(bValue);
         return sortDirection === 'asc' ? comparison : -comparison;
       }
-      
       if (typeof aValue === 'number' && typeof bValue === 'number') {
         return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
       }
-      
       return 0;
     });
 
     setFilteredClients(filtered);
-  }, [clients, searchTerm, statusFilter, sortField, sortDirection]);
+  }, [clients, searchTerm, sortField, sortDirection]);
 
   const handleRetry = () => {
     fetchClients();
@@ -99,7 +86,6 @@ const ClientsPage: React.FC = () => {
 
   const clearFilters = () => {
     setSearchTerm('');
-    setStatusFilter('');
   };
 
   const handleSort = (field: keyof Client) => {
@@ -120,15 +106,7 @@ const ClientsPage: React.FC = () => {
     return sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />;
   };
 
-  const hasActiveFilters = searchTerm || statusFilter;
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  const hasActiveFilters = searchTerm;
 
   if (isLoading) {
     return (
@@ -212,25 +190,8 @@ const ClientsPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Filter Controls */}
+            {/* Filter Controls (none for now) */}
             <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-colors duration-200 ${
-                  showFilters || statusFilter
-                    ? 'bg-blue-50 border-blue-200 text-blue-700'
-                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <Filter className="h-4 w-4" />
-                <span>Filters</span>
-                {statusFilter && (
-                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                    1
-                  </span>
-                )}
-              </button>
-
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
@@ -241,29 +202,6 @@ const ClientsPage: React.FC = () => {
               )}
             </div>
           </div>
-
-          {/* Expandable Filter Options */}
-          {showFilters && (
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
-                  </label>
-                  <select
-                    id="statusFilter"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="block w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">All statuses</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Results Count */}
@@ -279,117 +217,51 @@ const ClientsPage: React.FC = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('name')}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Name</span>
-                      {getSortIcon('name')}
-                    </div>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('Id')}>
+                    <div className="flex items-center space-x-1"><span>ID</span>{getSortIcon('Id')}</div>
                   </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('email')}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Email</span>
-                      {getSortIcon('email')}
-                    </div>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('ClientName')}>
+                    <div className="flex items-center space-x-1"><span>Name</span>{getSortIcon('ClientName')}</div>
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Company
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('ClientType')}>
+                    <div className="flex items-center space-x-1"><span>Type</span>{getSortIcon('ClientType')}</div>
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Phone
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('OrganizationName')}>
+                    <div className="flex items-center space-x-1"><span>Organization</span>{getSortIcon('OrganizationName')}</div>
                   </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('status')}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Status</span>
-                      {getSortIcon('status')}
-                    </div>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('Email')}>
+                    <div className="flex items-center space-x-1"><span>Email</span>{getSortIcon('Email')}</div>
                   </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('createdAt')}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Created</span>
-                      {getSortIcon('createdAt')}
-                    </div>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('Mobile')}>
+                    <div className="flex items-center space-x-1"><span>Mobile</span>{getSortIcon('Mobile')}</div>
                   </th>
-                  <th 
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('documentCount')}
-                  >
-                    <div className="flex items-center space-x-1">
-                      <span>Documents</span>
-                      {getSortIcon('documentCount')}
-                    </div>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('Country')}>
+                    <div className="flex items-center space-x-1"><span>Country</span>{getSortIcon('Country')}</div>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('City')}>
+                    <div className="flex items-center space-x-1"><span>City</span>{getSortIcon('City')}</div>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('Gender')}>
+                    <div className="flex items-center space-x-1"><span>Gender</span>{getSortIcon('Gender')}</div>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('Description')}>
+                    <div className="flex items-center space-x-1"><span>Description</span>{getSortIcon('Description')}</div>
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredClients.map((client) => (
-                  <tr 
-                    key={client.id}
-                    onClick={() => handleClientClick(client.id)}
-                    className="hover:bg-gray-50 cursor-pointer transition-colors duration-150"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-blue-600 font-semibold text-sm">
-                            {client.name.charAt(0)}
-                          </span>
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">{client.name}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <Mail className="h-4 w-4 text-gray-400 mr-2" />
-                        {client.email}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <Building className="h-4 w-4 text-gray-400 mr-2" />
-                        {client.company || '—'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center text-sm text-gray-900">
-                        <Phone className="h-4 w-4 text-gray-400 mr-2" />
-                        {client.phone || '—'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        client.status === 'active'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {client.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 text-gray-400 mr-2" />
-                        {formatDate(client.createdAt)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <div className="flex items-center">
-                        <FileText className="h-4 w-4 text-gray-400 mr-2" />
-                        {client.documentCount}
-                      </div>
-                    </td>
+                  <tr key={client.Id} onClick={() => handleClientClick(client.Id.toString())} className="hover:bg-gray-50 cursor-pointer transition-colors duration-150">
+                    <td className="px-4 py-4 whitespace-nowrap">{client.Id}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{client.ClientName}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{client.ClientType}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{client.OrganizationName}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{client.Email}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{client.Mobile}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{client.Country}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{client.City}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{client.Gender}</td>
+                    <td className="px-4 py-4 whitespace-nowrap">{client.Description}</td>
                   </tr>
                 ))}
               </tbody>

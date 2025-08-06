@@ -35,14 +35,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setIsLoading(true);
       const response = await authApi.login(credentials);
-      
+
       // Store auth data
-      tokenStorage.setToken(response.token, response.expiresAt);
-      tokenStorage.setUser(response.user);
-      
+      tokenStorage.setToken(response.Token, '2099-12-31T23:59:59Z'); // No expiresAt in response, set far future
+      tokenStorage.setUser(response.UserDetail);
+
       // Update state
-      setToken(response.token);
-      setUser(response.user);
+      setToken(response.Token);
+      setUser(response.UserDetail);
     } catch (error) {
       throw error;
     } finally {

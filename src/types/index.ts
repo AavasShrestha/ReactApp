@@ -1,18 +1,26 @@
 export interface User {
-  id: string;
-  email: string;
-  name?: string;
+  Id: number;
+  Username: string;
+  FullName: string;
+  CompanyName: string | null;
+  BranchName: string | null;
+  Branchid: number;
+  IsActive: boolean;
+  Email: string | null;
+  Gender: string | null;
+  Phone: string | null;
+  Remarks: string | null;
 }
 
 export interface LoginCredentials {
-  email: string;
-  password: string;
+  UserName: string;
+  Password: string;
+  companyCode: string;
 }
 
 export interface LoginResponse {
-  token: string;
-  user: User;
-  expiresAt: string;
+  UserDetail: User;
+  Token: string;
 }
 
 export interface Document {
@@ -24,14 +32,16 @@ export interface Document {
 }
 
 export interface Client {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  company?: string;
-  status: 'active' | 'inactive';
-  createdAt: string;
-  documentCount: number;
+  Id: number;
+  ClientName: string;
+  ClientType: string;
+  OrganizationName: string;
+  Email: string;
+  Country: string;
+  Mobile: string;
+  Gender: string;
+  City: string;
+  Description: string;
 }
 
 export interface DashboardStats {

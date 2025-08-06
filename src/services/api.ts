@@ -53,48 +53,24 @@ api.interceptors.response.use(
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
-      // Dummy authentication for demo purposes
-      // In production, this would make a real API call to your .NET backend
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Check dummy credentials
-      const validCredentials = [
-        { email: 'admin@example.com', password: 'password123' },
-        { email: 'user@demo.com', password: 'demo123' },
-        { email: 'test@test.com', password: 'test123' }
-      ];
-      
-      const isValid = validCredentials.some(
-        cred => cred.email === credentials.email && cred.password === credentials.password
+      const { companyCode, ...rest } = credentials;
+      const response = await axios.post<LoginResponse>(
+        'https://localhost/api/Login/userauthentication',
+        rest,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Tenant-ID': companyCode,
+          },
+        }
       );
-      
-      if (!isValid) {
-        throw {
-          message: 'Invalid email or password',
-          status: 401
-        };
-      }
-      
-      // Return dummy successful login response
-      const dummyResponse: LoginResponse = {
-        token: 'dummy-jwt-token-' + Date.now(),
-        user: {
-          id: '1',
-          email: credentials.email,
-          name: credentials.email.split('@')[0].charAt(0).toUpperCase() + credentials.email.split('@')[0].slice(1)
-        },
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24 hours from now
+      return response.data;
+    } catch (error: any) {
+      const apiError: ApiError = {
+        message: error.response?.data?.message || error.message || 'Login failed',
+        status: error.response?.status,
       };
-      
-      return dummyResponse;
-      
-      // Uncomment below for real API integration:
-      // const response = await api.post<LoginResponse>('/api/auth/login', credentials);
-      // return response.data;
-    } catch (error) {
-      throw error;
+      throw apiError;
     }
   },
 };
@@ -192,65 +168,30 @@ export const clientApi = {
       // Return dummy clients
       const dummyClients: Client[] = [
         {
-          id: '1',
-          name: 'John Smith',
-          email: 'john.smith@acme.com',
-          phone: '+1 (555) 123-4567',
-          company: 'Acme Corporation',
-          status: 'active',
-          createdAt: '2024-01-10T08:00:00Z',
-          documentCount: 5
+          Id: 1,
+          ClientName: 'John Doe',
+          ClientType: 'Individual',
+          OrganizationName: 'Doe Consulting',
+          Email: 'john.doe@example.com',
+          Country: 'Nepal',
+          Mobile: '9765432101',
+          Gender: 'Male',
+          City: 'Kathmandu',
+          Description: 'Regular client'
         },
         {
-          id: '2',
-          name: 'Sarah Johnson',
-          email: 'sarah.johnson@techstart.com',
-          phone: '+1 (555) 234-5678',
-          company: 'TechStart Inc.',
-          status: 'active',
-          createdAt: '2024-01-12T10:30:00Z',
-          documentCount: 3
-        },
-        {
-          id: '3',
-          name: 'Michael Brown',
-          email: 'michael.brown@globaltech.com',
-          phone: '+1 (555) 345-6789',
-          company: 'GlobalTech Solutions',
-          status: 'inactive',
-          createdAt: '2024-01-08T14:15:00Z',
-          documentCount: 2
-        },
-        {
-          id: '4',
-          name: 'Emily Davis',
-          email: 'emily.davis@innovate.com',
-          phone: '+1 (555) 456-7890',
-          company: 'Innovate Labs',
-          status: 'active',
-          createdAt: '2024-01-15T09:45:00Z',
-          documentCount: 7
-        },
-        {
-          id: '5',
-          name: 'David Wilson',
-          email: 'david.wilson@megacorp.com',
-          phone: '+1 (555) 567-8901',
-          company: 'MegaCorp Industries',
-          status: 'active',
-          createdAt: '2024-01-11T16:20:00Z',
-          documentCount: 4
-        },
-        {
-          id: '6',
-          name: 'Lisa Anderson',
-          email: 'lisa.anderson@startup.com',
-          phone: '+1 (555) 678-9012',
-          company: 'Startup Ventures',
-          status: 'inactive',
-          createdAt: '2024-01-09T11:10:00Z',
-          documentCount: 1
+          Id: 2,
+          ClientName: 'Jane Smith',
+          ClientType: 'Corporate',
+          OrganizationName: 'Smith Enterprises',
+          Email: 'jane.smith@smithent.com',
+          Country: 'India',
+          Mobile: '9876543210',
+          Gender: 'Female',
+          City: 'Delhi',
+          Description: 'VIP client'
         }
+        // Add more dummy clients as needed
       ];
       
       return dummyClients;
