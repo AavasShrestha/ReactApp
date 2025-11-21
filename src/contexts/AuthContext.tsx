@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, LoginCredentials, AuthContextType, ApiError } from '../types';
+import { User, LoginCredentials, AuthContextType } from '../types';
 import { authApi } from '../services/api';
 import { tokenStorage } from '../utils/auth';
 
@@ -34,7 +34,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (credentials: LoginCredentials): Promise<void> => {
     try {
       setIsLoading(true);
+      console.log('AuthContext: Starting login with credentials:', credentials);
+      
       const response = await authApi.login(credentials);
+      console.log('AuthContext: Received response:', response);
 
       // Store auth data
       tokenStorage.setToken(response.Token, '2099-12-31T23:59:59Z'); // No expiresAt in response, set far future
@@ -43,7 +46,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Update state
       setToken(response.Token);
       setUser(response.UserDetail);
+      
+      console.log('AuthContext: Login successful, user and token set');
     } catch (error) {
+      console.log('AuthContext: Login error:', error);
       throw error;
     } finally {
       setIsLoading(false);

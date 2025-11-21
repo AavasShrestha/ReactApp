@@ -1,6 +1,7 @@
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'auth_user';
 const EXPIRES_KEY = 'auth_expires';
+const TENANT_KEY = 'tenant_id';
 
 export const tokenStorage = {
   getToken: (): string | null => {
@@ -35,10 +36,13 @@ export const tokenStorage = {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
   },
 
+  // Tenant ID no longer used
+
   clearAuth: (): void => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(EXPIRES_KEY);
+    localStorage.removeItem(TENANT_KEY);
   }
 };
 

@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
             <div className="flex items-center space-x-2">
               <User className="h-5 w-5 text-gray-500" />
               <span className="text-sm text-gray-700">
-                {user?.name || user?.email}
+                {user?.FullName || user?.Email}
               </span>
             </div>
             

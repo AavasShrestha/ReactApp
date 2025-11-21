@@ -4,10 +4,8 @@
 - **Fields:**
   - **Username** (`UserName`)
   - **Password** (`Password`)
-  - **Company Code** (`companyCode`, numbers only)
 - **Validation:**
   - All fields are required.
-  - Company Code must be numeric.
 
 ## 2. Form Submission
 - When the user submits the form:
@@ -32,11 +30,9 @@
   ```
 - **Headers:**
   - `Content-Type: application/json`
-  - `Tenant-ID: companyCode` (from the form)
 
 - **Implementation:**
-  - The `companyCode` is extracted from credentials and sent as the `Tenant-ID` header.
-  - The rest of the credentials are sent as the request body.
+  - Credentials are sent in the request body. No tenant header is required.
 
 ## 5. API Response
 - **Expected Response:**
@@ -76,11 +72,11 @@ sequenceDiagram
     participant authApi
     participant Backend
 
-    User->>LoginPage: Enter Username, Password, Company Code
+    User->>LoginPage: Enter Username, Password
     User->>LoginPage: Click Login
     LoginPage->>AuthContext: login(credentials)
     AuthContext->>authApi: login(credentials)
-    authApi->>Backend: POST /api/Login/userauthentication\nHeaders: Tenant-ID, Body: credentials
+    authApi->>Backend: POST /api/Login/userauthentication\nBody: credentials
     Backend-->>authApi: { UserDetail, Token }
     authApi-->>AuthContext: { UserDetail, Token }
     AuthContext->>LoginPage: Update state, store token/user
@@ -90,4 +86,4 @@ sequenceDiagram
 ---
 
 **In summary:**
-- User fills the form → credentials and company code are validated → API is called with company code as header → response is stored and user is logged in → token is used for all future requests.
+- User fills the form → credentials are validated → API is called without tenant header → response is stored and user is logged in → token is used for all future requests.

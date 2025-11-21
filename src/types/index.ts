@@ -10,12 +10,13 @@ export interface User {
   Gender: string | null;
   Phone: string | null;
   Remarks: string | null;
+  // added later for UserForm
+  Role: string | null;
 }
 
 export interface LoginCredentials {
   UserName: string;
   Password: string;
-  companyCode: string;
 }
 
 export interface LoginResponse {
@@ -23,32 +24,91 @@ export interface LoginResponse {
   Token: string;
 }
 
-export interface Document {
-  id: string;
-  fileName: string;
-  documentType: string;
-  uploadedDate: string;
-  fileSize?: number;
+
+// export interface Client {
+//   Id: number;
+//   ClientName: string;
+//   ClientType: string;
+//   OrganizationName: string;
+//   Email: string;
+//   Country: string;
+//   Mobile: string;
+//   Gender: string;
+//   City: string;
+//   Description: string;
+//   CreatedDate?: string;
+//   IsActive?: boolean;
+// }
+
+// types.ts
+export interface Client {
+  client_id: number;
+  client_name: string;
+  db_name: string;
+  created_by: number;
+  modified_by: number;
+  created_date: string;
+  modified_date: string;
+  logo: string;
+  owner: string;
+  address: string;
+  primary_phone: string;
+  secondary_phone: string;
+  primary_email: string;
+  secondary_email: string;
+  sms_service: boolean;
+  approval_system: boolean;
+  collection_app: boolean;
 }
 
-export interface Client {
+export type NewClient = Omit<Client, "client_id" | "created_by" | "modified_by" | "created_date" | "modified_date" | "logo">;
+
+
+export interface Database {
   Id: number;
-  ClientName: string;
-  ClientType: string;
-  OrganizationName: string;
-  Email: string;
-  Country: string;
-  Mobile: string;
-  Gender: string;
-  City: string;
-  Description: string;
+  DatabaseName: string;
+  ConnectionString: string;
+  DatabaseType: string;
+  ServerName: string;
+  Port?: number;
+  IsActive: boolean;
+  CreatedDate?: string;
+  LastBackupDate?: string;
 }
+
+export type NewDatabase = Omit<Database, 'Id'>;
+
+export interface UserManagement {
+  Id: number;
+  Username: string;
+  FullName: string;
+  Email: string;
+  Role: string;
+  IsActive: boolean;
+  CreatedDate?: string;
+  LastLoginDate?: string;
+}
+
+export interface NewUser {
+  Username: string;
+  Password: string;
+  ConfirmPassword: string;
+  FullName: string;
+  Email: string;
+  Phone: string;
+  Gender: string;
+  Remarks: string;
+  IsActive: boolean;
+}
+
 
 export interface DashboardStats {
   totalClients: number;
-  totalDocuments: number;
+  totalUsers: number;
+  totalDatabases: number;
   activeClients: number;
-  recentDocuments: number;
+  activeUsers: number;
+  activeDatabases: number;
 }
 
 export interface AuthContextType {

@@ -1,234 +1,278 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { LoginCredentials, LoginResponse, Document, Client, DashboardStats, ApiError } from '../types';
-import { tokenStorage } from '../utils/auth';
+import axios, { AxiosInstance, AxiosResponse } from "axios";
+import { 
+  LoginCredentials, 
+  LoginResponse, 
+  DashboardStats, 
+  ApiError,
+  Client,
+  NewClient,
+  Database,
+  NewDatabase,
+  UserManagement,
+  NewUser
+} from "../types";
+import { tokenStorage } from "../utils/auth";
 
-// Create Axios instance with base configuration
+/* ------------------ Base URL ------------------ */
+const getBaseURL = () => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  if (envUrl) {
+    console.debug('[API] Using environment API URL:', envUrl);
+    return envUrl;
+  }
+  
+  // Fallback URLs for development
+  const fallbackUrls = [
+    "https://localhost:7001",
+    "http://localhost:7001", 
+    "https://localhost:5114",
+    "http://localhost:5114"
+  ];
+  
+  console.debug('[API] No environment URL found, using fallback:', fallbackUrls[0]);
+  return fallbackUrls[0];
+};
+
+/* ------------------ Axios Instance ------------------ */
 const api: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: getBaseURL(),
   timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // Do not set a global Content-Type; let Axios infer per request.
 });
 
-// Request interceptor to add auth token
+/* ------------------ Interceptors ------------------ */
+// Request → attach token
 api.interceptors.request.use(
   (config) => {
     const token = tokenStorage.getToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+
+    // Debug: Log request details for troubleshooting
+    console.debug('[API Request]', {
+      url: config.url,
+      method: config.method,
+      hasToken: !!token,
+      headers: config.headers
+    });
+
+    // If sending FormData, remove Content-Type so browser sets multipart boundary
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      if (config.headers && 'Content-Type' in config.headers) {
+        delete (config.headers as any)['Content-Type'];
+      }
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle errors and token expiration
+// Response → handle errors
 api.interceptors.response.use(
-  (response: AxiosResponse) => {
-    return response;
-  },
+  (response: AxiosResponse) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid, clear auth data
+    const apiError: ApiError = {
+      message: error.response?.data?.message || error.message || "An unexpected error occurred",
+      status: error.response?.status || 0,
+    };
+
+    // Auto-logout on 401
+    if (apiError.status === 401) {
       tokenStorage.clearAuth();
-      // Redirect to login if not already there
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
       }
     }
-    
-    const apiError: ApiError = {
-      message: error.response?.data?.message || error.message || 'An unexpected error occurred',
-      status: error.response?.status,
-    };
-    
+
+    // SSL or connection errors
+    if (error.code === "ERR_SSL_PROTOCOL_ERROR" || error.message?.includes("SSL")) {
+      apiError.message = "SSL connection error. Check API server or use HTTP for dev.";
+      apiError.status = 0;
+    }
+
     return Promise.reject(apiError);
   }
 );
 
-// Auth API calls
+/* ------------------ Auth API ------------------ */
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
     try {
-      const { companyCode, ...rest } = credentials;
-      const response = await axios.post<LoginResponse>(
-        'https://localhost/api/Login/userauthentication',
-        rest,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            'Tenant-ID': companyCode,
-          },
-        }
+      // Use the same Axios instance for consistency
+      const response = await api.post<any>(
+        "/api/Login/userauthentication",
+        credentials
       );
-      return response.data;
+
+      // Debug: Log the response to see what we're getting
+      console.log('Login response:', response.data);
+
+      // Handle new backend format with IsSuccess and Message
+      if (response.data.IsSuccess !== undefined) {
+        // New format: { IsSuccess: boolean, Message: string, UserDetail?: User, Token?: string }
+        console.log('Using new format, IsSuccess:', response.data.IsSuccess);
+        
+        if (!response.data.IsSuccess) {
+          console.log('Login failed, message:', response.data.Message);
+          throw new Error(response.data.Message || 'Login failed');
+        }
+        
+        if (!response.data.Token || !response.data.UserDetail) {
+          console.log('Missing Token or UserDetail');
+          throw new Error('Invalid response from server');
+        }
+        
+        console.log('Login successful, returning data');
+        // Return in the expected format
+        return {
+          UserDetail: response.data.UserDetail,
+          Token: response.data.Token
+        };
+      } else {
+        // Old format: { UserDetail: User, Token: string }
+        console.log('Using old format');
+        return response.data;
+      }
     } catch (error: any) {
-      const apiError: ApiError = {
-        message: error.response?.data?.message || error.message || 'Login failed',
-        status: error.response?.status,
-      };
-      throw apiError;
+      // Handle HTTP errors (network issues, server errors, etc.)
+      if (error.response?.data?.Message) {
+        // If backend provides a message, use it
+        throw new Error(error.response.data.Message);
+      } else if (error.response?.data?.message) {
+        // Alternative message field
+        throw new Error(error.response.data.message);
+      } else if (error.message) {
+        // Use the error message from the HTTP client
+        throw new Error(error.message);
+      } else {
+        // Fallback message
+        throw new Error("Login failed. Please check your credentials and try again.");
+      }
     }
   },
 };
 
-// Document API calls
-export const documentApi = {
-  getDocuments: async (): Promise<Document[]> => {
+
+/* ------------------ Client API ------------------ */
+export const clientApi = {
+  getClients: async (): Promise<Client[]> => {
     try {
-      // Dummy documents for demo purposes
-      // In production, this would make a real API call to your .NET backend
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      // Return dummy documents
-      const dummyDocuments: Document[] = [
-        {
-          id: '1',
-          fileName: 'project-proposal.pdf',
-          documentType: 'PDF',
-          uploadedDate: '2024-01-15T10:30:00Z',
-          fileSize: 2048576
-        },
-        {
-          id: '2',
-          fileName: 'company-logo.png',
-          documentType: 'Image',
-          uploadedDate: '2024-01-14T14:22:00Z',
-          fileSize: 512000
-        },
-        {
-          id: '3',
-          fileName: 'financial-report.xlsx',
-          documentType: 'Spreadsheet',
-          uploadedDate: '2024-01-13T09:15:00Z',
-          fileSize: 1024000
-        },
-        {
-          id: '4',
-          fileName: 'meeting-notes.docx',
-          documentType: 'Document',
-          uploadedDate: '2024-01-12T16:45:00Z',
-          fileSize: 256000
-        },
-        {
-          id: '5',
-          fileName: 'presentation.pptx',
-          documentType: 'Presentation',
-          uploadedDate: '2024-01-11T11:20:00Z',
-          fileSize: 4096000
-        }
-      ];
-      
-      return dummyDocuments;
-      
-      // Uncomment below for real API integration:
-      // const response = await api.get<Document[]>('/api/document');
-      // return response.data;
-    } catch (error) {
+      const response = await api.get<Client[]>("/api/Client");
+      return response.data;
+    } catch (error: any) {
+      console.error('[clientApi.getClients] Error:', error);
       throw error;
     }
   },
   
-  getDocumentUrl: (fileName: string): string => {
-    // For demo purposes, return placeholder URLs
-    // In production, this would return the actual file URL from your backend
-    
-    const fileExt = fileName.split('.').pop()?.toLowerCase();
-    
-    // Return appropriate placeholder based on file type
-    if (fileExt === 'pdf') {
-      return 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
-    } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExt || '')) {
-      return `https://picsum.photos/800/600?random=${fileName}`;
-    } else {
-      // For other file types, we'll just return a placeholder
-      return '#';
-    }
-    
-    // Uncomment below for real API integration:
-    // return `${import.meta.env.VITE_API_BASE_URL}/UploadedFiles/${fileName}`;
+  createClient: async (payload: NewClient): Promise<Client> => {
+    const response = await api.post<Client>("/api/Client", payload);
+    return response.data;
+  },
+  
+  updateClient: async (id: number | string, payload: Partial<NewClient>): Promise<Client> => {
+    const response = await api.put<Client>(`/api/Client/${encodeURIComponent(String(id))}`, payload);
+    return response.data;
+  },
+  
+  deleteClient: async (id: number | string): Promise<void> => {
+    await api.delete(`/api/Client/${encodeURIComponent(String(id))}`);
   },
 };
 
-// Client API calls
-export const clientApi = {
-  getClients: async (): Promise<Client[]> => {
+/* ------------------ Database API ------------------ */
+export const databaseApi = {
+  getDatabases: async (): Promise<Database[]> => {
     try {
-      // Dummy clients for demo purposes
-      // In production, this would make a real API call to your .NET backend
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 600));
-      
-      // Return dummy clients
-      const dummyClients: Client[] = [
-        {
-          Id: 1,
-          ClientName: 'John Doe',
-          ClientType: 'Individual',
-          OrganizationName: 'Doe Consulting',
-          Email: 'john.doe@example.com',
-          Country: 'Nepal',
-          Mobile: '9765432101',
-          Gender: 'Male',
-          City: 'Kathmandu',
-          Description: 'Regular client'
-        },
-        {
-          Id: 2,
-          ClientName: 'Jane Smith',
-          ClientType: 'Corporate',
-          OrganizationName: 'Smith Enterprises',
-          Email: 'jane.smith@smithent.com',
-          Country: 'India',
-          Mobile: '9876543210',
-          Gender: 'Female',
-          City: 'Delhi',
-          Description: 'VIP client'
-        }
-        // Add more dummy clients as needed
-      ];
-      
-      return dummyClients;
-      
-      // Uncomment below for real API integration:
-      // const response = await api.get<Client[]>('/api/clients');
-      // return response.data;
-    } catch (error) {
+      const response = await api.get<Database[]>("/api/Database");
+      return response.data;
+    } catch (error: any) {
+      console.error('[databaseApi.getDatabases] Error:', error);
       throw error;
     }
   },
+  
+  createDatabase: async (payload: NewDatabase): Promise<Database> => {
+    const response = await api.post<Database>("/api/Database", payload);
+    return response.data;
+  },
+  
+  updateDatabase: async (id: number | string, payload: Partial<NewDatabase>): Promise<Database> => {
+    const response = await api.put<Database>(`/api/Database/${encodeURIComponent(String(id))}`, payload);
+    return response.data;
+  },
+  
+  deleteDatabase: async (id: number | string): Promise<void> => {
+    await api.delete(`/api/Database/${encodeURIComponent(String(id))}`);
+  },
+  
+  testConnection: async (id: number | string): Promise<{ success: boolean; message: string }> => {
+    const response = await api.post(`/api/Database/${encodeURIComponent(String(id))}/test`);
+    return response.data;
+  },
+  
+  backupDatabase: async (id: number | string): Promise<{ success: boolean; message: string }> => {
+    const response = await api.post(`/api/Database/${encodeURIComponent(String(id))}/backup`);
+    return response.data;
+  },
 };
 
-// Dashboard API calls
+/* ------------------ User Management API ------------------ */
+export const userApi = {
+  getUsers: async (): Promise<UserManagement[]> => {
+    try {
+      const response = await api.get<UserManagement[]>("/api/User");
+      return response.data;
+    } catch (error: any) {
+      console.error('[userApi.getUsers] Error:', error);
+      throw error;
+    }
+  },
+  
+  createUser: async (payload: NewUser): Promise<UserManagement> => {
+    const response = await api.post<UserManagement>("/api/User", payload);
+    return response.data;
+  },
+  
+  updateUser: async (id: number | string, payload: Partial<NewUser>): Promise<UserManagement> => {
+    const response = await api.put<UserManagement>(`/api/User/${encodeURIComponent(String(id))}`, payload);
+    return response.data;
+  },
+  
+  deleteUser: async (id: number | string): Promise<void> => {
+    await api.delete(`/api/User/${encodeURIComponent(String(id))}`);
+  },
+  
+  toggleUserStatus: async (id: number | string): Promise<UserManagement> => {
+    const response = await api.patch<UserManagement>(`/api/User/${encodeURIComponent(String(id))}/toggle-status`);
+    return response.data;
+  },
+};
+
+/* ------------------ Dashboard API ------------------ */
 export const dashboardApi = {
   getStats: async (): Promise<DashboardStats> => {
+    const response = await api.get<DashboardStats>("/api/dashboard/stats");
+    return response.data;
+  },
+};
+
+/* ------------------ Health Check API ------------------ */
+export const healthApi = {
+  checkConnection: async (): Promise<{ status: string; message: string }> => {
     try {
-      // Dummy stats for demo purposes
-      // In production, this would make a real API call to your .NET backend
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Return dummy stats
-      const dummyStats: DashboardStats = {
-        totalClients: 6,
-        totalDocuments: 22,
-        activeClients: 4,
-        recentDocuments: 8
-      };
-      
-      return dummyStats;
-      
-      // Uncomment below for real API integration:
-      // const response = await api.get<DashboardStats>('/api/dashboard/stats');
-      // return response.data;
-    } catch (error) {
+      const response = await api.get("/api/health");
+      return response.data;
+    } catch (error: any) {
+      // Try alternative health endpoints
+      const healthEndpoints = ["/health", "/api/Health", "/"];
+      for (const endpoint of healthEndpoints) {
+        try {
+          await api.get(endpoint);
+          return { status: "ok", message: "API is reachable" };
+        } catch (e: any) {
+          console.debug(`Health check failed for ${endpoint}:`, e.status);
+        }
+      }
       throw error;
     }
   },

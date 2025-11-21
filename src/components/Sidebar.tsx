@@ -3,7 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Users, 
-  FileText, 
+  UserCheck, 
+  Database,
   LogOut,
   Menu,
   X
@@ -33,10 +34,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
       current: location.pathname === '/clients'
     },
     {
-      name: 'Documents',
-      href: '/documents',
-      icon: FileText,
-      current: location.pathname === '/documents'
+      name: 'Users',
+      href: '/users',
+      icon: UserCheck,
+      current: location.pathname === '/users'
+    },
+    {
+      name: 'Databases',
+      href: '/databases',
+      icon: Database,
+      current: location.pathname === '/databases'
     }
   ];
 
@@ -80,12 +87,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
             <div className="flex items-center">
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                 <span className="text-blue-600 font-semibold">
-                  {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                  {user?.FullName?.charAt(0) || user?.Email?.charAt(0) || 'U'}
                 </span>
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">{user?.name || 'User'}</p>
-                <p className="text-xs text-gray-500">{user?.email}</p>
+                <p className="text-sm font-medium text-gray-900">{user?.FullName || 'User'}</p>
+                <p className="text-xs text-gray-500">{user?.Email}</p>
               </div>
             </div>
           </div>
