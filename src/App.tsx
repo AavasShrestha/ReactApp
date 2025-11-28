@@ -3,15 +3,13 @@ import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import LoginPage from './components/LoginPage';
-// import Dashboard from './components/Dashboard';
 import Dashboard from './DashBoard/Dashboard';
-import ClientsPage from './components/ClientsPage';
 import UsersPage from './components/UsersPage';
-import DatabasesPage from './components/DatabasesPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import UserPage from './components/Users/UserPage';
 import ClientPage from './components/Clients/ClientPage';
-// import DashboardPage from './components/DashBoard/DashBoard';
+import DatabasePage from './components/DataBase/DatasbasePage';
+
 
 function App() {
   return (
@@ -22,10 +20,10 @@ function App() {
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<LoginPage />} />
-              
+
               {/* Protected Routes with Layout */}
-              <Route 
-                path="/dashboard" 
+              <Route
+                path="/dashboard"
                 element={
                   <ProtectedRoute>
                     <Layout>
@@ -34,48 +32,48 @@ function App() {
                       {/* <Dashboard /> */}
                     </Layout>
                   </ProtectedRoute>
-                } 
+                }
               />
-              
-              <Route 
-                path="/clients" 
+
+              <Route
+                path="/clients"
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <ClientPage/>
+                      <ClientPage />
                       {/* <ClientsPage /> */}
                     </Layout>
                   </ProtectedRoute>
-                } 
+                }
               />
-              
-              <Route 
-                path="/users" 
+
+              <Route
+                path="/users"
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <UserPage/>
+                      <UserPage />
                       {/* <UsersPage /> */}
                     </Layout>
                   </ProtectedRoute>
-                } 
+                }
               />
-              
-              <Route 
-                path="/databases" 
+
+              <Route
+                path="/databases"
                 element={
                   <ProtectedRoute>
                     <Layout>
-                      <DatabasesPage />
+                      <DatabasePage />
                     </Layout>
                   </ProtectedRoute>
-                } 
+                }
               />
-              
-              
+
+
               {/* Default redirect to dashboard */}
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              
+
               {/* Catch-all redirect */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>

@@ -1,3 +1,4 @@
+// src/pages/Client/ClientForm.tsx
 import React, { useEffect, useState } from "react";
 import { Client, NewClient } from "../../types";
 
@@ -27,6 +28,21 @@ const ClientForm: React.FC<ClientFormProps> = ({ client, onSubmit, onCreate, onC
     if (client) {
       const { client_id, created_by, modified_by, created_date, modified_date, logo, ...rest } = client;
       setFormData(rest);
+    } else {
+      // Reset form for new client
+      setFormData({
+        client_name: "",
+        db_name: "",
+        address: "",
+        primary_phone: "",
+        secondary_phone: "",
+        primary_email: "",
+        secondary_email: "",
+        owner: "",
+        sms_service: false,
+        approval_system: false,
+        collection_app: false,
+      });
     }
   }, [client]);
 
@@ -45,6 +61,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ client, onSubmit, onCreate, onC
       {[
         { label: "Client Name", name: "client_name" },
         { label: "DB Name", name: "db_name" },
+        { label: "Owner", name: "owner" },
         { label: "Address", name: "address" },
         { label: "Primary Phone", name: "primary_phone" },
         { label: "Secondary Phone", name: "secondary_phone" },
@@ -53,18 +70,26 @@ const ClientForm: React.FC<ClientFormProps> = ({ client, onSubmit, onCreate, onC
       ].map(f => (
         <div key={f.name}>
           <label className="block text-sm font-medium text-gray-700 mb-1">{f.label}</label>
-          <input type="text" name={f.name} value={formData[f.name as keyof NewClient] || ""} onChange={handleChange} className="w-full border rounded px-3 py-2"/>
+          <input
+            type="text"
+            name={f.name}
+            value={formData[f.name as keyof NewClient] || ""}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+          />
         </div>
       ))}
 
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-2 col-span-2">
         <input type="checkbox" name="collection_app" checked={formData.collection_app} onChange={handleChange} />
         <label className="text-sm font-medium text-gray-700">Active</label>
       </div>
 
       <div className="col-span-2 flex justify-end space-x-3 mt-4">
         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
-        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">{client ? "Update" : "Create"}</button>
+        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          {client ? "Update Client" : "Create Client"}
+        </button>
       </div>
     </form>
   );

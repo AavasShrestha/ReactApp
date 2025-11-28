@@ -63,20 +63,21 @@ export interface Client {
 
 export type NewClient = Omit<Client, "client_id" | "created_by" | "modified_by" | "created_date" | "modified_date" | "logo">;
 
-
+// src/types.ts
 export interface Database {
   Id: number;
-  DatabaseName: string;
-  ConnectionString: string;
-  DatabaseType: string;
-  ServerName: string;
-  Port?: number;
-  IsActive: boolean;
-  CreatedDate?: string;
-  LastBackupDate?: string;
+  Project_name: string;
+  Db_name: string;
+  isActive: boolean;
 }
 
-export type NewDatabase = Omit<Database, 'Id'>;
+export interface NewDatabase {
+  Project_name: string;
+  Db_name: string;
+  isActive: boolean;
+}
+
+
 
 export interface UserManagement {
   Id: number;

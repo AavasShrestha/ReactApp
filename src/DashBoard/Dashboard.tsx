@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { FiUsers, FiUserCheck } from "react-icons/fi";
 import clientService from "../services/Client/clientService";
-import { userService } from "../services/User/userService";
+import { userService } from "../services/user/userService";
 import {
   BarChart,
   Bar,
