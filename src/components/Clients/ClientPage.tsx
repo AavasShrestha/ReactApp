@@ -66,7 +66,7 @@ const ClientPage: React.FC = () => {
         <h1 className="text-2xl font-semibold">Clients</h1>
         <button
           onClick={() => setIsCreateOpen(true)}
-          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + New Client
         </button>
