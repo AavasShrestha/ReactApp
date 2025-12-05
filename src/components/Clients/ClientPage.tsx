@@ -51,7 +51,17 @@ const ClientPage: React.FC = () => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure?")) return;
+    const client = clients.find(c => c.client_id === id);
+    if (!client) return;
+
+    // Block deletion if client is active
+    if (client.collection_app === true) {
+      alert("This client is active. Please mark it as inactive before deleting.");
+      return;
+    }
+
+    if (!window.confirm("Are you sure you want to delete this inactive client?")) return;
+
     try {
       await clientService.delete(id);
       await fetchClients();
@@ -59,11 +69,11 @@ const ClientPage: React.FC = () => {
       console.error("Delete error:", err);
     }
   };
-
+  
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-semibold">Clients</h1>
+        <h1 className="text-2xl font-semibold">Clients List Table</h1>
         <button
           onClick={() => setIsCreateOpen(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"

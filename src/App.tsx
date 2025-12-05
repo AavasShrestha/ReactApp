@@ -9,6 +9,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import UserPage from './components/Users/UserPage';
 import ClientPage from './components/Clients/ClientPage';
 import DatabasePage from './components/DataBase/DatasbasePage';
+import LogoPage from './components/Logo/LogoPage';
 
 
 function App() {
@@ -65,6 +66,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <DatabasePage />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/logos"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <LogoPage />
                     </Layout>
                   </ProtectedRoute>
                 }
