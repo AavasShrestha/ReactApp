@@ -29,15 +29,12 @@ const mapClient = (c: any): Client => ({
 const mapToBackend = (data: NewClient) => ({
   client_name: data.client_name,
   db_name: data.db_name,
-
   Owner: data.owner,
   Address: data.address,
-
   Primary_phone: data.primary_phone,
   Secondary_phone: data.secondary_phone,
   Primary_email: data.primary_email,
   Secondary_email: data.secondary_email,
-
   SMS_service: data.sms_service,
   ApprovalSystem: data.approval_system,
   CollectionApp: data.collection_app,
@@ -54,37 +51,29 @@ const clientService = {
     return mapClient(res.data);
   },
 
- create: async (data: NewClient): Promise<Client> => {
-  const formData = new FormData();
-  Object.entries(mapToBackend(data)).forEach(([key, value]) =>
-    formData.append(key, value as any)
-  );
+  create: async (data: NewClient & { logo?: File }): Promise<Client> => {
+    const formData = new FormData();
+    Object.entries(mapToBackend(data)).forEach(([key, value]) => formData.append(key, value as any));
 
-  const res = await api.post("/api/ClientDetail", formData, {
-    headers: { "Content-Type": "multipart/form-data" }
-  });
+    if (data.logo instanceof File) formData.append("logo", data.logo);
 
-  return mapClient(res.data);
-},
+    const res = await api.post("/api/ClientDetail", formData, { headers: { "Content-Type": "multipart/form-data" } });
+    return mapClient(res.data);
+  },
 
+  update: async (id: number, data: NewClient & { logo?: File }): Promise<Client> => {
+    const formData = new FormData();
+    Object.entries(mapToBackend(data)).forEach(([key, value]) => formData.append(key, value as any));
 
- update: async (id: number, data: NewClient): Promise<Client> => {
-  const formData = new FormData();
-  Object.entries(mapToBackend(data)).forEach(([key, value]) =>
-    formData.append(key, value as any)
-  );
+    if (data.logo instanceof File) formData.append("logo", data.logo);
 
-  const res = await api.put(`/api/ClientDetail/${id}`, formData, {
-    headers: { "Content-Type": "multipart/form-data" }
-  });
+    const res = await api.put(`/api/ClientDetail/${id}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+    return mapClient(res.data);
+  },
 
-  return mapClient(res.data);
-},
-
-
- delete: async (id: number) => {
-  await api.delete(`/api/ClientDetail/${id}`);
- },
+  delete: async (id: number) => {
+    await api.delete(`/api/ClientDetail/${id}`);
+  },
 };
 
 export default clientService;

@@ -7,8 +7,7 @@ import clientService from "../../services/Client/clientService";
 const ClientPage: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     fetchClients();
@@ -19,43 +18,41 @@ const ClientPage: React.FC = () => {
       const data = await clientService.getAll();
       setClients(data);
     } catch (err) {
-      console.error("Failed to fetch clients:", err);
+      console.error(err);
     }
   };
 
-  const handleCreate = async (data: NewClient) => {
+  const handleCreate = async (data: NewClient & { logo?: File }) => {
     try {
       await clientService.create(data);
-      await fetchClients();
-      setIsCreateOpen(false);
-    } catch (err) {
-      console.error("Create error:", err);
+      fetchClients();
+      setModalOpen(false);
+    } catch (err: any) {
+      alert(err.response?.data?.message || "Failed to create client");
     }
   };
 
-  const handleUpdate = async (id: number, data: NewClient) => {
+  const handleUpdate = async (id: number, data: NewClient & { logo?: File }) => {
     try {
       await clientService.update(id, data);
-      await fetchClients();
-      setIsEditOpen(false);
+      fetchClients();
       setSelectedClient(null);
-    } catch (err) {
-      console.error("Update error:", err);
-      alert("Failed to update client.");
+      setModalOpen(false);
+    } catch (err: any) {
+      alert(err.response?.data?.message || "Failed to update client");
     }
   };
 
   const handleEditClick = (client: Client) => {
     setSelectedClient(client);
-    setIsEditOpen(true);
+    setModalOpen(true);
   };
 
   const handleDelete = async (id: number) => {
     const client = clients.find(c => c.client_id === id);
     if (!client) return;
 
-    // Block deletion if client is active
-    if (client.collection_app === true) {
+    if (client.collection_app) {
       alert("This client is active. Please mark it as inactive before deleting.");
       return;
     }
@@ -64,18 +61,19 @@ const ClientPage: React.FC = () => {
 
     try {
       await clientService.delete(id);
-      await fetchClients();
+      fetchClients();
     } catch (err) {
-      console.error("Delete error:", err);
+      alert("Failed to delete client");
+      console.error(err);
     }
   };
-  
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-semibold">Clients List Table</h1>
         <button
-          onClick={() => setIsCreateOpen(true)}
+          onClick={() => { setSelectedClient(null); setModalOpen(true); }}
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           + New Client
@@ -84,33 +82,23 @@ const ClientPage: React.FC = () => {
 
       <ClientList clients={clients} onEdit={handleEditClick} onDelete={handleDelete} />
 
-      {/* Create Client Modal */}
-      {isCreateOpen && (
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+      {modalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex justify-center items-start pt-10 z-50">
           <div className="bg-white p-6 rounded shadow-lg w-96 relative">
             <button
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-              onClick={() => setIsCreateOpen(false)}
+              onClick={() => setModalOpen(false)}
             >
               ✕
             </button>
-            <h2 className="text-xl font-semibold mb-4">Create New Client</h2>
-            <ClientForm client={null} onClose={() => setIsCreateOpen(false)} onCreate={handleCreate} onSubmit={() => { }} />
+            <h2 className="text-xl font-semibold mb-4">{selectedClient ? "Edit Client" : "Create New Client"}</h2>
+            <ClientForm
+              client={selectedClient}
+              onSubmit={handleUpdate}
+              onCreate={handleCreate}
+              onClose={() => setModalOpen(false)}
+            />
           </div>
-        </div>
-      )}
-
-      {/* Edit Client Drawer */}
-      {isEditOpen && selectedClient && (
-        <div className="fixed top-0 right-0 h-full w-96 bg-white shadow-lg p-6 z-50 overflow-y-auto">
-          <button
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
-            onClick={() => setIsEditOpen(false)}
-          >
-            ✕
-          </button>
-          <h2 className="text-xl font-semibold mb-4">Edit Client</h2>
-          <ClientForm client={selectedClient} onClose={() => setIsEditOpen(false)} onCreate={() => { }} onSubmit={handleUpdate} />
         </div>
       )}
     </div>

@@ -1,16 +1,15 @@
-// src/pages/Client/ClientForm.tsx
 import React, { useEffect, useState } from "react";
 import { Client, NewClient } from "../../types";
 
 interface ClientFormProps {
   client?: Client | null;
-  onSubmit: (id: number, data: NewClient) => void;
-  onCreate: (data: NewClient) => void;
+  onSubmit: (id: number, data: NewClient & { logo?: File }) => void;
+  onCreate: (data: NewClient & { logo?: File }) => void;
   onClose: () => void;
 }
 
 const ClientForm: React.FC<ClientFormProps> = ({ client, onSubmit, onCreate, onClose }) => {
-  const [formData, setFormData] = useState<NewClient>({
+  const [formData, setFormData] = useState<NewClient & { logo?: File }>({
     client_name: "",
     db_name: "",
     address: "",
@@ -27,9 +26,8 @@ const ClientForm: React.FC<ClientFormProps> = ({ client, onSubmit, onCreate, onC
   useEffect(() => {
     if (client) {
       const { client_id, created_by, modified_by, created_date, modified_date, logo, ...rest } = client;
-      setFormData(rest);
+      setFormData({ ...rest });
     } else {
-      // Reset form for new client
       setFormData({
         client_name: "",
         db_name: "",
@@ -47,8 +45,10 @@ const ClientForm: React.FC<ClientFormProps> = ({ client, onSubmit, onCreate, onC
   }, [client]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = e.target as HTMLInputElement;
-    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
+    const { name, value, type, checked, files } = e.target as HTMLInputElement;
+    if (type === "checkbox") setFormData({ ...formData, [name]: checked });
+    else if (type === "file") setFormData({ ...formData, logo: files?.[0] });
+    else setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -80,6 +80,19 @@ const ClientForm: React.FC<ClientFormProps> = ({ client, onSubmit, onCreate, onC
         </div>
       ))}
 
+      <div className="col-span-2">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Logo</label>
+        <input type="file" accept="image/*" onChange={handleChange} />
+      </div>
+
+      <div className="flex items-center space-x-2 col-span-2">
+        <input type="checkbox" name="sms_service" checked={formData.sms_service} onChange={handleChange} />
+        <label className="text-sm font-medium text-gray-700">SMS Service</label>
+      </div>
+      <div className="flex items-center space-x-2 col-span-2">
+        <input type="checkbox" name="approval_system" checked={formData.approval_system} onChange={handleChange} />
+        <label className="text-sm font-medium text-gray-700">Approval System</label>
+      </div>
       <div className="flex items-center space-x-2 col-span-2">
         <input type="checkbox" name="collection_app" checked={formData.collection_app} onChange={handleChange} />
         <label className="text-sm font-medium text-gray-700">Active</label>

@@ -41,6 +41,28 @@ export interface LoginResponse {
 // }
 
 // types.ts
+// export interface Client {
+//   client_id: number;
+//   client_name: string;
+//   db_name: string;
+//   created_by: number;
+//   modified_by: number;
+//   created_date: string;
+//   modified_date: string;
+//   document: string;
+//   owner: string;
+//   address: string;
+//   primary_phone: string;
+//   secondary_phone: string;
+//   primary_email: string;
+//   secondary_email: string;
+//   sms_service: boolean;
+//   approval_system: boolean;
+//   collection_app: boolean;
+// }
+
+// export type NewClient = Omit<Client, "client_id" | "created_by" | "modified_by" | "created_date" | "modified_date" | "logo">;
+
 export interface Client {
   client_id: number;
   client_name: string;
@@ -49,7 +71,7 @@ export interface Client {
   modified_by: number;
   created_date: string;
   modified_date: string;
-  logo: string;
+  logo: string; // string from server
   owner: string;
   address: string;
   primary_phone: string;
@@ -61,7 +83,37 @@ export interface Client {
   collection_app: boolean;
 }
 
-export type NewClient = Omit<Client, "client_id" | "created_by" | "modified_by" | "created_date" | "modified_date" | "logo">;
+export type NewClient = Omit<
+  Client,
+  "client_id" | "created_by" | "modified_by" | "created_date" | "modified_date" | "logo"
+> & { logo?: File }; // frontend can provide a File
+
+
+// export interface Client {
+//   client_id: number;
+//   client_name: string;
+//   db_name: string;
+//   created_by: number;
+//   modified_by: number;
+//   created_date: string;
+//   modified_date: string;
+//   logo: string; // previously logo
+//   owner: string;
+//   address: string;
+//   primary_phone: string;
+//   secondary_phone: string;
+//   primary_email: string;
+//   secondary_email: string;
+//   sms_service: boolean;
+//   approval_system: boolean;
+//   collection_app: boolean;
+// }
+
+// // NewClient for frontend create/edit
+// export type NewClient = Omit<Client, "client_id" | "created_by" | "modified_by" | "created_date" | "modified_date" | "document"> & {
+//   document?: File; // optional file upload
+// };
+
 
 // src/types.ts
 export interface Database {
