@@ -1,10 +1,6 @@
 import React from "react";
 import { User } from "../../types";
-
-
-// interface for userlist component 
-// users: array of user objects fetched form backend
-// onEdit: function triggered when user clicks Edit, onDelet: function triggered when user clicks Delete
+import { Pencil, Trash2 } from "lucide-react";
 
 interface UserListProps {
     users: User[];
@@ -12,17 +8,10 @@ interface UserListProps {
     onDelete: (id: number) => void;
 }
 
-// userList component
-// Display all the users in a simple, responsive table
-// provides edit and delete actions for each user
-
 const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete }) => {
-
-
     return (
-
         <div className="overflow-x-auto bg-white rounded-xl shadow-md p-4">
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse text-sm">
                 {/* ---- Table Header ---- */}
                 <thead>
                     <tr className="bg-gray-100 text-left text-gray-700">
@@ -40,15 +29,12 @@ const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete }) => {
                 {/* ---- Table Body ---- */}
                 <tbody>
                     {users.length === 0 ? (
-                        // If there are no users, show a friendly message
                         <tr>
                             <td colSpan={8} className="text-center p-4 text-gray-500">
                                 No users found.
                             </td>
                         </tr>
                     ) : (
-
-                        // Loop through users and display each one
                         users.map((user) => (
                             <tr
                                 key={user.Id}
@@ -61,31 +47,35 @@ const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete }) => {
                                 <td className="p-3">{user.CompanyName ?? "-"}</td>
                                 <td className="p-3">{user.BranchName ?? "-"}</td>
 
-                                {/* Conditional rendering for active/inactive */}
+                                {/* Active/Inactive pill */}
                                 <td className="p-3">
-                                    {user.IsActive ? (
-                                        <span className="text-green-600 font-medium">Active</span>
-                                    ) : (
-                                        <span className="text-red-600 font-medium">Inactive</span>
-                                    )}
+                                    <span
+                                        className={`px-2 py-1 text-xs rounded-full font-medium ${
+                                            user.IsActive
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-red-100 text-red-700"
+                                        }`}
+                                    >
+                                        {user.IsActive ? "Active" : "Inactive"}
+                                    </span>
                                 </td>
 
-                                {/* Action buttons */}
-                                <td className="p-3 text-center space-x-2">
-                                    {/* Edit Button */}
+                                {/* Action buttons with icons */}
+                                <td className="p-3 text-center flex justify-center items-center space-x-2">
                                     <button
                                         onClick={() => onEdit(user)}
-                                        className="bg-yellow-400 text-white px-3 py-1 rounded-md hover:bg-yellow-500"
+                                        className="p-1 rounded hover:bg-yellow-100 text-yellow-600 hover:text-yellow-800"
+                                        title="Edit"
                                     >
-                                        Edit
+                                        <Pencil size={18} />
                                     </button>
 
-                                    {/* Delete Button */}
                                     <button
                                         onClick={() => onDelete(user.Id)}
-                                        className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                                        className="p-1 rounded hover:bg-red-100 text-red-600 hover:text-red-800"
+                                        title="Delete"
                                     >
-                                        Delete
+                                        <Trash2 size={18} />
                                     </button>
                                 </td>
                             </tr>
@@ -94,7 +84,6 @@ const UserList: React.FC<UserListProps> = ({ users, onEdit, onDelete }) => {
                 </tbody>
             </table>
         </div>
-
     );
 };
 

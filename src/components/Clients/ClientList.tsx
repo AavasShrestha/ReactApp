@@ -2,6 +2,8 @@ import React from "react";
 import { Client } from "../../types";
 import { Pencil, Trash2 } from "lucide-react";
 
+const BASE_URL = "http://localhost:5114"; // Backend URL
+
 interface ClientListProps {
   clients: Client[];
   onEdit: (client: Client) => void;
@@ -19,30 +21,54 @@ const ClientList: React.FC<ClientListProps> = ({ clients, onEdit, onDelete }) =>
         </tr>
       </thead>
       <tbody>
-        {clients.length ? clients.map((c, i) => (
-          <tr key={c.client_id} className="border-t hover:bg-gray-50 transition">
-            <td className="py-1 px-2">{i + 1}</td>
-            <td className="py-1 px-2">{c.logo ? <img src={c.logo} alt={c.client_name} className="w-12 h-12 object-cover rounded" /> : "N/A"}</td>
-            <td className="py-1 px-2">{c.client_name}</td>
-            <td className="py-1 px-2">{c.db_name}</td>
-            <td className="py-1 px-2">{c.owner || "N/A"}</td>
-            <td className="py-1 px-2">{c.address || "N/A"}</td>
-            <td className="py-1 px-2">{c.primary_phone || "N/A"}</td>
-            <td className="py-1 px-2">{c.primary_email || "N/A"}</td>
-            <td className="py-1 px-2">{c.sms_service ? "Yes" : "No"}</td>
-            <td className="py-1 px-2">{c.approval_system ? "Yes" : "No"}</td>
-            <td className="py-1 px-2">{c.collection_app ? "Yes" : "No"}</td>
-            <td className="py-2 px-1">
-              <span className={`px-2 py-1 text-xs rounded-full ${c.collection_app ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                {c.collection_app ? "Active" : "Inactive"}
-              </span>
-            </td>
-            <td className="py-2 px-4 text-center space-x-2">
-              <button onClick={() => onEdit(c)} className="p-1 rounded hover:bg-blue-50 text-blue-600 hover:text-blue-800"><Pencil size={18} /></button>
-              <button onClick={() => onDelete(c.client_id)} className="p-1 rounded hover:bg-red-50 text-red-600 hover:text-red-800"><Trash2 size={18} /></button>
-            </td>
-          </tr>
-        )) : (
+        {clients.length ? clients.map((c, i) => {
+          const logoUrl = c.logo ? `${BASE_URL}/api/ClientDetail/image/${c.client_id}/${c.logo}` : null;
+
+          return (
+            <tr key={c.client_id} className="border-t hover:bg-gray-50 transition">
+              <td className="py-1 px-2">{i + 1}</td>
+              <td className="py-1 px-2">
+                {logoUrl ? (
+                  /\.(jpg|jpeg|png|gif|bmp)$/i.test(c.logo!) ? (
+                    <img
+                      src={logoUrl}
+                      alt={c.client_name}
+                      className="w-12 h-12 object-cover rounded"
+                      title={`${c.logo} (Photo)`}
+                    />
+                  ) : (
+                    <div
+                      className="w-12 h-12 flex items-center justify-center bg-gray-100 text-gray-600 rounded text-xs"
+                      title={`${c.logo} (Document)`}
+                    >
+                      DOC
+                    </div>
+                  )
+                ) : (
+                  "N/A"
+                )}
+              </td>
+              <td className="py-1 px-2">{c.client_name}</td>
+              <td className="py-1 px-2">{c.db_name}</td>
+              <td className="py-1 px-2">{c.owner || "N/A"}</td>
+              <td className="py-1 px-2">{c.address || "N/A"}</td>
+              <td className="py-1 px-2">{c.primary_phone || "N/A"}</td>
+              <td className="py-1 px-2">{c.primary_email || "N/A"}</td>
+              <td className="py-1 px-2">{c.sms_service ? "Yes" : "No"}</td>
+              <td className="py-1 px-2">{c.approval_system ? "Yes" : "No"}</td>
+              <td className="py-1 px-2">{c.collection_app ? "Yes" : "No"}</td>
+              <td className="py-2 px-1">
+                <span className={`px-2 py-1 text-xs rounded-full ${c.collection_app ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                  {c.collection_app ? "Active" : "Inactive"}
+                </span>
+              </td>
+              <td className="py-2 px-4 text-center space-x-2">
+                <button onClick={() => onEdit(c)} className="p-1 rounded hover:bg-blue-50 text-blue-600 hover:text-blue-800"><Pencil size={18} /></button>
+                <button onClick={() => onDelete(c.client_id)} className="p-1 rounded hover:bg-red-50 text-red-600 hover:text-red-800"><Trash2 size={18} /></button>
+              </td>
+            </tr>
+          );
+        }) : (
           <tr>
             <td colSpan={13} className="py-4 text-center text-gray-500">No clients found</td>
           </tr>

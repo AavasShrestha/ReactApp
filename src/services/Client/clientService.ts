@@ -23,6 +23,8 @@ const mapClient = (c: any): Client => ({
   created_date: c.created_date,
   modified_date: c.modified_date,
   logo: c.Logo || "",
+  isLive: !!c.CID,
+
 });
 
 /** Frontend → Backend mapper */
@@ -38,6 +40,8 @@ const mapToBackend = (data: NewClient) => ({
   SMS_service: data.sms_service,
   ApprovalSystem: data.approval_system,
   CollectionApp: data.collection_app,
+  CID: data.isLive, //  map frontend isLive to backend CID
+
 });
 
 const clientService = {
@@ -61,15 +65,38 @@ const clientService = {
     return mapClient(res.data);
   },
 
+  // update: async (id: number, data: NewClient & { logo?: File }): Promise<Client> => {
+  //   const formData = new FormData();
+  //   Object.entries(mapToBackend(data)).forEach(([key, value]) => formData.append(key, value as any));
+
+  //   if (data.logo instanceof File) formData.append("logo", data.logo);
+
+  //   const res = await api.put(`/api/ClientDetail/${id}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+  //   return mapClient(res.data);
+  // },
   update: async (id: number, data: NewClient & { logo?: File }): Promise<Client> => {
-    const formData = new FormData();
-    Object.entries(mapToBackend(data)).forEach(([key, value]) => formData.append(key, value as any));
+  const formData = new FormData();
 
-    if (data.logo instanceof File) formData.append("logo", data.logo);
+  // Map booleans to "true"/"false" strings
+  Object.entries(mapToBackend(data)).forEach(([key, value]) => {
+    if (typeof value === "boolean") {
+      formData.append(key, value ? "true" : "false");
+    } else {
+      // Convert everything else to string
+      formData.append(key, value !== undefined && value !== null ? String(value) : "");
+    }
+  });
 
-    const res = await api.put(`/api/ClientDetail/${id}`, formData, { headers: { "Content-Type": "multipart/form-data" } });
-    return mapClient(res.data);
-  },
+  // Append logo if provided
+  if (data.logo instanceof File) formData.append("logo", data.logo);
+
+  const res = await api.put(`/api/ClientDetail/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" }
+  });
+
+  return mapClient(res.data);
+},
+
 
   delete: async (id: number) => {
     await api.delete(`/api/ClientDetail/${id}`);

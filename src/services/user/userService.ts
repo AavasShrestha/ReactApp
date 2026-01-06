@@ -1,7 +1,8 @@
 import axios from "axios";
 import { User, NewUser } from "../../types";
 
-const API_BASE_URL = "http://localhost:5114/api/User";
+// Use VITE_API_BASE_URL from .env
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/api/User";
 
 export const userService = {
 

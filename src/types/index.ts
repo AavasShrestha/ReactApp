@@ -24,45 +24,6 @@ export interface LoginResponse {
   Token: string;
 }
 
-
-// export interface Client {
-//   Id: number;
-//   ClientName: string;
-//   ClientType: string;
-//   OrganizationName: string;
-//   Email: string;
-//   Country: string;
-//   Mobile: string;
-//   Gender: string;
-//   City: string;
-//   Description: string;
-//   CreatedDate?: string;
-//   IsActive?: boolean;
-// }
-
-// types.ts
-// export interface Client {
-//   client_id: number;
-//   client_name: string;
-//   db_name: string;
-//   created_by: number;
-//   modified_by: number;
-//   created_date: string;
-//   modified_date: string;
-//   document: string;
-//   owner: string;
-//   address: string;
-//   primary_phone: string;
-//   secondary_phone: string;
-//   primary_email: string;
-//   secondary_email: string;
-//   sms_service: boolean;
-//   approval_system: boolean;
-//   collection_app: boolean;
-// }
-
-// export type NewClient = Omit<Client, "client_id" | "created_by" | "modified_by" | "created_date" | "modified_date" | "logo">;
-
 export interface Client {
   client_id: number;
   client_name: string;
@@ -81,6 +42,7 @@ export interface Client {
   sms_service: boolean;
   approval_system: boolean;
   collection_app: boolean;
+  isLive: boolean;
 }
 
 export type NewClient = Omit<
@@ -88,31 +50,6 @@ export type NewClient = Omit<
   "client_id" | "created_by" | "modified_by" | "created_date" | "modified_date" | "logo"
 > & { logo?: File }; // frontend can provide a File
 
-
-// export interface Client {
-//   client_id: number;
-//   client_name: string;
-//   db_name: string;
-//   created_by: number;
-//   modified_by: number;
-//   created_date: string;
-//   modified_date: string;
-//   logo: string; // previously logo
-//   owner: string;
-//   address: string;
-//   primary_phone: string;
-//   secondary_phone: string;
-//   primary_email: string;
-//   secondary_email: string;
-//   sms_service: boolean;
-//   approval_system: boolean;
-//   collection_app: boolean;
-// }
-
-// // NewClient for frontend create/edit
-// export type NewClient = Omit<Client, "client_id" | "created_by" | "modified_by" | "created_date" | "modified_date" | "document"> & {
-//   document?: File; // optional file upload
-// };
 
 
 // src/types.ts

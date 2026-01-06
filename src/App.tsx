@@ -29,8 +29,6 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <Dashboard />
-                      {/* <DashboardPage/> */}
-                      {/* <Dashboard /> */}
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -42,7 +40,6 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <ClientPage />
-                      {/* <ClientsPage /> */}
                     </Layout>
                   </ProtectedRoute>
                 }
@@ -54,7 +51,6 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <UserPage />
-                      {/* <UsersPage /> */}
                     </Layout>
                   </ProtectedRoute>
                 }

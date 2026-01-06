@@ -16,10 +16,9 @@ import { tokenStorage } from "../utils/auth";
 /* ------------------ Base URL ------------------ */
 const getBaseURL = () => {
   const envUrl = import.meta.env.VITE_API_BASE_URL;
-  if (envUrl) return envUrl;
-
+  
   // Correct backend base URL
-  return "http://localhost:5114";
+  return envUrl;
 };
 
 /* ------------------ Axios Instance ------------------ */
