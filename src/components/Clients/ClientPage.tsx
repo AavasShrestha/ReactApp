@@ -148,15 +148,14 @@ const ClientPage: React.FC = () => {
               
                 <td className="py-2 px-1 text-left">
                   <span
-                    className={`px-2 py-1 text-xs rounded-full ${c.sms_service ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                      }`}
+                    className={`px-2 py-1 text-xs rounded-full ${c.sms_service ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700" }`}
                   >
                     {c.sms_service ? "Yes" : "No"}
                   </span>
                 </td>
                
                 <td className="py-1 px-2 text-center">
-                  <span className={`px-2 py-1 rounded text-white ${c.isLive ? "bg-green-600" : "bg-gray-600"}`}>
+                  <span className={`px-2 py-1 rounded text-white ${c.isLive ? "bg-green-400 text-green-700 border-" : "bg-red-100 text-red-700" }`}>
                     {c.isLive ? "Yes" : "No"}
                   </span>
                 </td>
