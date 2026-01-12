@@ -64,7 +64,7 @@ const ClientPage: React.FC = () => {
   // Update client
   const handleUpdate = async (id: number, data: NewClient & { logo?: File }) => {
     try {
-      await clientService.update(id, data);   
+      await clientService.update(id, data);
       fetchClients();
       setSelectedClient(null);
       setModalOpen(false);
@@ -145,21 +145,26 @@ const ClientPage: React.FC = () => {
                 <td className="py-1 px-2 text-left">{c.client_name}</td>
                 <td className="py-1 px-2 text-left">{c.db_name}</td>
                 <td className="py-1 px-2 text-left">{c.address || "N/A"}</td>
-              
+
                 <td className="py-2 px-1 text-left">
                   <span
-                    className={`px-2 py-1 text-xs rounded-full ${c.sms_service ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700" }`}
+                    className={`px-2 py-1 text-xs rounded-full ${c.sms_service ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                      }`}
                   >
                     {c.sms_service ? "Yes" : "No"}
                   </span>
                 </td>
-               
-                <td className="py-1 px-2 text-center">
-                  <span className={`px-2 py-1 rounded text-white ${c.isLive ? "bg-green-400 text-green-700 border-" : "bg-red-100 text-red-700" }`}>
+
+                <td className="py-2 px-1 text-center">
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${c.isLive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                      }`}
+                  >
                     {c.isLive ? "Yes" : "No"}
                   </span>
                 </td>
-              
+
+
                 <td className="py-2 px-1 text-center">
                   <span
                     className={`px-2 py-1 text-xs rounded-full ${c.approval_system ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
@@ -168,15 +173,15 @@ const ClientPage: React.FC = () => {
                     {c.approval_system ? "Yes" : "No"}
                   </span>
                 </td>
-               
-               
+
+
                 <td className="py-2 px-1 text-center">
                   <span className={`px-2 py-1 text-xs rounded-full ${c.collection_app ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
                     {c.collection_app ? "Active" : "Inactive"}
                   </span>
                 </td>
 
-                
+
                 <td className="py-2 px-4 text-center">
                   <div className="flex justify-center items-center space-x-2">
                     <button onClick={() => handleViewClick(c)} className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800" title="View Details">
