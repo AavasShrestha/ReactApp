@@ -193,6 +193,14 @@ const ClientPage: React.FC = () => {
                     <button onClick={() => handleDelete(c.client_id)} className="p-1 rounded hover:bg-red-50 text-red-600 hover:text-red-800" title="Delete">
                       🗑
                     </button>
+                    {/* Settings / Three-dot Button */}
+                    <button
+                      onClick={() => console.log("Settings clicked for client:", c.client_id)}
+                      className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800"
+                      title="More Options"
+                    >
+                      ⋮
+                    </button>
                   </div>
                 </td>
               </tr>
