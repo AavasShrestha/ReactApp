@@ -184,23 +184,26 @@ const ClientPage: React.FC = () => {
 
                 <td className="py-2 px-4 text-center">
                   <div className="flex justify-center items-center space-x-2">
+
                     <button onClick={() => handleViewClick(c)} className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800" title="View Details">
                       <Eye size={18} />
                     </button>
+
                     <button onClick={() => handleEditClick(c)} className="p-1 rounded hover:bg-blue-50 text-blue-600 hover:text-blue-800" title="Edit">
                       ✎
                     </button>
+
                     <button onClick={() => handleDelete(c.client_id)} className="p-1 rounded hover:bg-red-50 text-red-600 hover:text-red-800" title="Delete">
                       🗑
                     </button>
+
                     {/* Settings / Three-dot Button */}
-                    <button
-                      onClick={() => console.log("Settings clicked for client:", c.client_id)}
-                      className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800"
+                    <button onClick={() => console.log("Settings clicked for client:", c.client_id)} className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800"
                       title="More Options"
                     >
                       ⋮
                     </button>
+                    
                   </div>
                 </td>
               </tr>
