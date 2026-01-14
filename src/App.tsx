@@ -10,6 +10,7 @@ import UserPage from './components/Users/UserPage';
 import ClientPage from './components/Clients/ClientPage';
 import DatabasePage from './components/DataBase/DatasbasePage';
 import LogoPage from './components/Logo/LogoPage';
+import EditPermissionForm from './components/Clients/EditPermissionForm';
 
 
 function App() {
@@ -40,6 +41,16 @@ function App() {
                   <ProtectedRoute>
                     <Layout>
                       <ClientPage />
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+                 <Route
+                path="/clients/:id/permissions/edit"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <EditPermissionForm />
                     </Layout>
                   </ProtectedRoute>
                 }
