@@ -3,12 +3,15 @@ import { Client, NewClient } from "../../types";
 import ClientForm from "./ClientForm";
 import clientService from "../../services/Client/clientService";
 import { Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ClientPage: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [viewClient, setViewClient] = useState<Client | null>(null);
+  const [menuClient, setMenuClient] = useState<Client | null>(null);
+  const navigate = useNavigate();
 
   // Databases array
   const [databases, setDatabases] = useState<string[]>([]);
@@ -198,12 +201,21 @@ const ClientPage: React.FC = () => {
                     </button>
 
                     {/* Settings / Three-dot Button */}
-                    <button onClick={() => console.log("Settings clicked for client:", c.client_id)} className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800"
+                    {/* <button onClick={() => console.log("Settings clicked for client:", c.client_id)} className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800"
+                      title="More Options"
+                    >
+                      ⋮
+                    </button> */}
+
+                    <button
+                      onClick={() => setMenuClient(c)}
+                      className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800"
                       title="More Options"
                     >
                       ⋮
                     </button>
-                    
+
+
                   </div>
                 </td>
               </tr>
@@ -242,7 +254,11 @@ const ClientPage: React.FC = () => {
       {viewClient && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-start pt-10 z-50">
           <div className="bg-white p-6 rounded shadow-lg w-96 relative">
-            <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => setViewClient(null)}>✕</button>
+
+            <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => setViewClient(null)}>
+              ✕
+            </button>
+
             <h2 className="text-xl font-semibold mb-4">Client Details</h2>
             <div className="space-y-2 text-sm text-gray-700">
               {viewClient.logo && (
