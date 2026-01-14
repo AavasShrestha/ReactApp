@@ -171,6 +171,26 @@ const ClientPage: React.FC = () => {
                     </button>
 
                     {/* Three-dot settings button */}
+
+                    <button onClick={() => handleViewClick(c)} className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800" title="View Details">
+                      <Eye size={18} />
+                    </button>
+
+                    <button onClick={() => handleEditClick(c)} className="p-1 rounded hover:bg-blue-50 text-blue-600 hover:text-blue-800" title="Edit">
+                      ✎
+                    </button>
+
+                    <button onClick={() => handleDelete(c.client_id)} className="p-1 rounded hover:bg-red-50 text-red-600 hover:text-red-800" title="Delete">
+                      🗑
+                    </button>
+
+                    {/* Settings / Three-dot Button */}
+                    {/* <button onClick={() => console.log("Settings clicked for client:", c.client_id)} className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800"
+                      title="More Options"
+                    >
+                      ⋮
+                    </button> */}
+
                     <button
                       onClick={() => setMenuClient(c)}
                       className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800"
@@ -178,6 +198,8 @@ const ClientPage: React.FC = () => {
                     >
                       ⋮
                     </button>
+
+
                   </div>
                 </td>
               </tr>
@@ -242,7 +264,11 @@ const ClientPage: React.FC = () => {
       {viewClient && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-start pt-10 z-50">
           <div className="bg-white p-6 rounded shadow-lg w-96 relative">
-            <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => setViewClient(null)}>✕</button>
+
+            <button className="absolute top-2 right-2 text-gray-500 hover:text-gray-800" onClick={() => setViewClient(null)}>
+              ✕
+            </button>
+
             <h2 className="text-xl font-semibold mb-4">Client Details</h2>
             <div className="space-y-2 text-sm text-gray-700">
               <div><strong>Name:</strong> {viewClient.client_name}</div>
