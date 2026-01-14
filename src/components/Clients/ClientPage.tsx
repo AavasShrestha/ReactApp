@@ -158,19 +158,6 @@ const ClientPage: React.FC = () => {
                 </td>
                 <td className="py-2 px-4 text-center">
                   <div className="flex justify-center items-center space-x-2">
-                    <button onClick={() => handleViewClick(c)} className="p-1 rounded hover:bg-gray-50">
-                      <Eye size={18} />
-                    </button>
-
-                    <button onClick={() => handleEditClick(c)} className="p-1 rounded hover:bg-blue-50 text-blue-700">
-                      ✎
-                    </button>
-
-                    <button onClick={() => handleDelete(c.client_id)} className="p-1 rounded hover:bg-red-50 text-red-700">
-                      🗑
-                    </button>
-
-                    {/* Three-dot settings button */}
 
                     <button onClick={() => handleViewClick(c)} className="p-1 rounded hover:bg-gray-50 text-gray-600 hover:text-gray-800" title="View Details">
                       <Eye size={18} />
@@ -275,6 +262,14 @@ const ClientPage: React.FC = () => {
               <div><strong>DB Name:</strong> {viewClient.db_name}</div>
               <div><strong>Address:</strong> {viewClient.address || "N/A"}</div>
               <div><strong>Active:</strong> {viewClient.collection_app ? "Yes" : "No"}</div>
+              <div><strong>Owner:</strong> {viewClient.owner || "N/A"}</div>
+              <div><strong>Primary Phone:</strong> {viewClient.primary_phone || "N/A"}</div>
+              <div><strong>Secondary Phone:</strong> {viewClient.secondary_phone || "N/A"}</div>
+              <div><strong>Primary Email:</strong> {viewClient.primary_email || "N/A"}</div>
+              <div><strong>Secondary Email:</strong> {viewClient.secondary_email || "N/A"}</div>
+              <div><strong>SMS Service:</strong> {viewClient.sms_service ? "Enabled" : "Disabled"}</div>
+              <div><strong>Approval System:</strong> {viewClient.approval_system ? "Enabled" : "Disabled"}</div>
+              <div><strong>Active: </strong> {viewClient.collection_app ? "Active" : "Inactive"}</div>
             </div>
           </div>
         </div>
