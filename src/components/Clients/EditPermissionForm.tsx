@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 
+// Define the shape of the permission form state
 interface PermissionForm {
   menuId: string;
   permissionName: string;
