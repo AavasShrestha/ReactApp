@@ -4,6 +4,7 @@ import ClientForm from "./ClientForm";
 import clientService from "../../services/Client/clientService";
 import { Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import PermissionTableModal from "./PermissionTableModal";
 
 const ClientPage: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
@@ -12,6 +13,7 @@ const ClientPage: React.FC = () => {
   const [viewClient, setViewClient] = useState<Client | null>(null);
   const [databases, setDatabases] = useState<string[]>([]);
   const [menuClient, setMenuClient] = useState<Client | null>(null); // for permissions modal
+  const [permissionClient, setPermissionClient] = useState<Client | null>(null);
 
   const navigate = useNavigate();
 
@@ -212,7 +214,19 @@ const ClientPage: React.FC = () => {
 
             <h3 className="text-lg font-semibold mb-3">{menuClient.client_name}</h3>
 
+
             <button
+              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+              onClick={() => {
+                setPermissionClient(menuClient);
+                setMenuClient(null);
+              }}
+            >
+              Manage Permissions
+            </button>
+
+            {/* For permission routing to Edit Form Page */}
+            {/* <button
               className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
               onClick={() => {
                 navigate(`/clients/${menuClient.client_id}/permissions/edit`);
@@ -220,7 +234,10 @@ const ClientPage: React.FC = () => {
               }}
             >
               Manage Permissions
-            </button>
+            </button> */}
+
+
+
           </div>
         </div>
       )}
@@ -246,6 +263,15 @@ const ClientPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      
+      {permissionClient && (
+        <PermissionTableModal
+          clientId={permissionClient.client_id}
+          onClose={() => setPermissionClient(null)}
+        />
+      )}
+
 
       {/* View Client Modal */}
       {viewClient && (

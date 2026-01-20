@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 // Define the shape of the permission form state
@@ -14,7 +14,9 @@ interface PermissionForm {
 }
 
 const EditPermissionForm = () => {
-  const { id } = useParams();    // client id (if you came from client page)
+  // const { id } = useParams();    // client id (if you came from client page)
+  const { id, permissionId } = useParams();
+
 
   const [form, setForm] = useState<PermissionForm>({
     menuId: "",
@@ -26,6 +28,18 @@ const EditPermissionForm = () => {
     canDelete: false,
     canView: false,
   });
+
+  useEffect(() => {
+    if (!id || !permissionId) return;
+
+    // fetch permission detail
+    console.log("Fetching permission", permissionId, "for client", id);
+
+    // Example:
+    // const data = await permissionService.getById(id, permissionId);
+    // setForm(data);
+  }, [id, permissionId]);
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -57,6 +71,13 @@ const EditPermissionForm = () => {
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
+      {/* Back Navigation */}
+      <button
+        onClick={() => window.history.back()}
+        className="text-sm text-blue-600 hover:underline mb-3"
+      >
+        ← Back to Permissions
+      </button>
       <h1 className="text-2xl font-semibold mb-2">Edit Permission</h1>
       <p className="text-gray-500 mb-6">
         Client ID: <span className="font-semibold">{id}</span>

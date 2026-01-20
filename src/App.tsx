@@ -45,7 +45,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-                 <Route
+              {/* <Route
                 path="/clients/:id/permissions/edit"
                 element={
                   <ProtectedRoute>
@@ -54,7 +54,19 @@ function App() {
                     </Layout>
                   </ProtectedRoute>
                 }
+              /> */}
+
+              <Route
+                path="/clients/:id/permissions/:permissionId/edit"
+                element={
+                  <ProtectedRoute>
+                    <Layout>
+                      <EditPermissionForm />
+                    </Layout>
+                  </ProtectedRoute>
+                }
               />
+
 
               <Route
                 path="/users"
