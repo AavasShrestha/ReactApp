@@ -35,7 +35,7 @@ const PermissionTableModal: React.FC<PermissionTableModalProps> = ({
     const fetchMenus = async () => {
       try {
         const res = await fetch(
-          "http://localhost:5114/api/AppMenu/GetAll"
+          "http://localhost:5114/api/TenantData/kamana/tbl_AppMenus"
         );
 
         if (!res.ok) {
